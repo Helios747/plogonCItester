@@ -11,3 +11,9 @@ This plugin aims to provide a convienence feature of automatically swapping hudl
 feel free to file issues in this repo or using the feedback system if thats enabled in /xlplugins.
 
 In the event I am no longer playing this game, I'll make an effort to update this repo to indicate such and suggest forking. But I doubt this plugin will break unless Dalamud's API significantly changes.
+
+# External Assets
+
+Icon is sourced from Google's Material Design Icons, licensed Apache 2.0
+
+https://github.com/google/material-design-icons
