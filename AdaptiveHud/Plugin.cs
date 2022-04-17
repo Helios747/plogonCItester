@@ -71,8 +71,16 @@ namespace AdaptiveHud
         private int currentLayout = 69;
         private unsafe int GetDisplaySetting()
         {
-            ConfigModule* cfg = ConfigModule.Instance();
-            return cfg->GetIntValue(20);
+            try
+            {
+                ConfigModule* cfg = ConfigModule.Instance();
+                if (cfg is not null);
+                return cfg->GetIntValue(20);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
         }
         public async void Start(XivCommonBase chatHandler, Configuration configuration)
         {
