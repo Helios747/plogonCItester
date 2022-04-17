@@ -86,41 +86,47 @@ namespace AdaptiveHud
         {
             while (true)
             {
-                // windowed mode
-                if (GetDisplaySetting() == 0 && currentLayout != configuration.LayoutForWindowedMode)
+                // got a funky crash when both were set to the same, decided to just do nothing rather
+                // than change config behind the user's back. As nothing should happen anyways.
+                if (configuration.LayoutForWindowedMode != configuration.LayoutForFullscreenMode)
                 {
-                    try
+                    // windowed mode
+                    if (GetDisplaySetting() == 0 && currentLayout != configuration.LayoutForWindowedMode)
                     {
-                        int adjustedLayoutValue = configuration.LayoutForWindowedMode + 1;
-                        string rawCmd = $"/hudlayout {adjustedLayoutValue}";
-                        string cleanCmd = chatHandler.Functions.Chat.SanitiseText(rawCmd);
-                        chatHandler.Functions.Chat.SendMessage(cleanCmd);
-                        currentLayout = configuration.LayoutForWindowedMode;
+                        try
+                        {
+                            int adjustedLayoutValue = configuration.LayoutForWindowedMode + 1;
+                            string rawCmd = $"/hudlayout {adjustedLayoutValue}";
+                            string cleanCmd = chatHandler.Functions.Chat.SanitiseText(rawCmd);
+                            chatHandler.Functions.Chat.SendMessage(cleanCmd);
+                            currentLayout = configuration.LayoutForWindowedMode;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            throw;
+                        }
                     }
-                    catch (Exception e)
+                    // both fullscreen mode types
+                    else if (GetDisplaySetting() > 0 && currentLayout != configuration.LayoutForFullscreenMode)
                     {
-                        Console.WriteLine(e);
-                        throw;
-                    }
-                }
-                // both fullscreen mode types
-                else if (GetDisplaySetting() > 0 && currentLayout != configuration.LayoutForFullscreenMode)
-                {
-                    try
-                    {
-                        int adjustedLayoutValue = configuration.LayoutForFullscreenMode + 1;
-                        string rawCmd = $"/hudlayout {adjustedLayoutValue}";
-                        string cleanCmd = chatHandler.Functions.Chat.SanitiseText(rawCmd);
-                        chatHandler.Functions.Chat.SendMessage(cleanCmd);
-                        currentLayout = configuration.LayoutForFullscreenMode;
+                        try
+                        {
+                            int adjustedLayoutValue = configuration.LayoutForFullscreenMode + 1;
+                            string rawCmd = $"/hudlayout {adjustedLayoutValue}";
+                            string cleanCmd = chatHandler.Functions.Chat.SanitiseText(rawCmd);
+                            chatHandler.Functions.Chat.SendMessage(cleanCmd);
+                            currentLayout = configuration.LayoutForFullscreenMode;
 
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        throw;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            throw;
+                        }
                     }
                 }
+
                 await Task.Delay(1000);
             }
         }
