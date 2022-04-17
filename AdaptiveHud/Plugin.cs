@@ -32,7 +32,7 @@ namespace AdaptiveHud
 
             this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "A useful message to display in /xlhelp"
+                HelpMessage = "Opens configuration window for Adaptive Hud"
             });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
