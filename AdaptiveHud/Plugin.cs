@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using XivCommon;
 
@@ -18,7 +19,9 @@ namespace AdaptiveHud
         private CommandManager CommandManager { get; init; }
         private Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
-        
+        CancellationTokenSource StopConfigMonitor = new CancellationTokenSource();
+
+
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] CommandManager commandManager)
@@ -40,13 +43,17 @@ namespace AdaptiveHud
             XivCommonBase chatHandler = new XivCommonBase();
             // start the monitor, all work is done in this class. Shouldn't block thread?
             GameSettingsMonitor gsm = new GameSettingsMonitor();
-            gsm.Start(chatHandler, Configuration);
+            CancellationToken token;
+            token = StopConfigMonitor.Token;
+            Task task = new Task(delegate { gsm.Start(chatHandler, Configuration); }, token);
+            task.Start();
         }
 
         public void Dispose()
         {
             this.PluginUi.Dispose();
             this.CommandManager.RemoveHandler(commandName);
+            this.StopConfigMonitor.Cancel();
         }
 
         private void OnCommand(string command, string args)
@@ -74,15 +81,21 @@ namespace AdaptiveHud
             try
             {
                 ConfigModule* cfg = ConfigModule.Instance();
-                if (cfg is not null);
-                return cfg->GetIntValue(20);
+                if (cfg is not null)
+                {
+                    return cfg->GetIntValue(20);
+                }
+                else
+                {
+                    return 0;
+                }
             }
             catch (Exception)
             {
                 return 0;
             }
         }
-        public async void Start(XivCommonBase chatHandler, Configuration configuration)
+        public void Start(XivCommonBase chatHandler, Configuration configuration)
         {
             while (true)
             {
@@ -126,8 +139,6 @@ namespace AdaptiveHud
                         }
                     }
                 }
-
-                await Task.Delay(1000);
             }
         }
     }
