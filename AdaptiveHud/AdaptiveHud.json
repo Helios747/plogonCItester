@@ -4,13 +4,12 @@
   "Punchline": "Switches your /hudlayout when your game switches from windowed to fullscreen.",
   "Description": "Useful for ultrawide users, swapping from windowed/fullscreen will automatically switch your hudlayout.\n\n/pah to configure",
   "InternalName": "adaptiveHud",
-  "AssemblyVersion": "1.0.0.0",
   "RepoUrl": "https://github.com/Helios747/AdaptiveHudPlugin",
   "DalamudApiLevel": 6,
   "ApplicableVersion": "any",
   "Tags": [
     "hudlayout",
-	"hud",
-	"settings"
+	  "hud",
+	  "settings"
   ]
 }

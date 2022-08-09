@@ -76,19 +76,13 @@ namespace AdaptiveHud
     public class GameSettingsMonitor
     {
         private int currentLayout = 69;
+
+        private unsafe ConfigModule* cfg = ConfigModule.Instance();
         private unsafe int GetDisplaySetting()
         {
             try
             {
-                ConfigModule* cfg = ConfigModule.Instance();
-                if (cfg is not null)
-                {
-                    return cfg->GetIntValue(20);
-                }
-                else
-                {
-                    return 0;
-                }
+                return cfg->GetIntValue(20);
             }
             catch (Exception)
             {
