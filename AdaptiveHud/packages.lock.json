@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net5.0-windows7.0": {
+      "DalamudPackager": {
+        "type": "Direct",
+        "requested": "[2.1.6, )",
+        "resolved": "2.1.6",
+        "contentHash": "JGgpGP2FMM5Vt4utyDD+xV2+XXfo3Rb3VgJ4FnvzkWlvn4JG/bBILo6mDubWCPjDGqT0n6dF1JRG0r5ygLv/ng=="
+      },
+      "XivCommon": {
+        "type": "Direct",
+        "requested": "[5.0.1-alpha.1, )",
+        "resolved": "5.0.1-alpha.1",
+        "contentHash": "Wdu8IY6VTR8OmBGYpqPtRUPo3qr5sF7dyGKwIL3ars9qbqxUzV8lwVVsORjjUQjOoQc6BnhGDuhThubJq2OO9A=="
+      }
+    }
+  }
+}
