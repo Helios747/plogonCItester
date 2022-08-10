@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Dalamud.Game.Command;
 using Dalamud.IoC;
+using Dalamud.Logging;
 using Dalamud.Plugin;
+using Dalamud.Game.ClientState;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using XivCommon;
 
@@ -19,15 +20,19 @@ namespace AdaptiveHud
         private CommandManager CommandManager { get; init; }
         private Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
-        CancellationTokenSource StopConfigMonitor = new CancellationTokenSource();
+
+        private ClientState ClientState { get; init; } = null!;
 
 
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager)
+            [RequiredVersion("1.0")] CommandManager commandManager,
+            [RequiredVersion("1.0")] ClientState clientState)
         {
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
+            this.ClientState = clientState;
+            
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
@@ -39,21 +44,16 @@ namespace AdaptiveHud
             });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;            
-            XivCommonBase chatHandler = new XivCommonBase();
-            // start the monitor, all work is done in this class. Shouldn't block thread?
-            GameSettingsMonitor gsm = new GameSettingsMonitor();
-            CancellationToken token;
-            token = StopConfigMonitor.Token;
-            Task task = new Task(delegate { gsm.Start(chatHandler, Configuration); }, token);
-            task.Start();
+            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+
+            clientState.Login += StartConfigMonitor;
+            
         }
 
         public void Dispose()
         {
             this.PluginUi.Dispose();
             this.CommandManager.RemoveHandler(commandName);
-            this.StopConfigMonitor.Cancel();
         }
 
         private void OnCommand(string command, string args)
@@ -71,30 +71,28 @@ namespace AdaptiveHud
         {
             this.PluginUi.SettingsVisible = true;
         }
+        private void StartConfigMonitor(object? _, EventArgs __)
+        {
+            PluginLog.LogDebug("Login detected, starting config monitor");
+            GameSettingsMonitor gsm = new();
+            Task task = new(delegate { gsm.Start(Configuration, ClientState); });
+            task.Start();
+        }
     }
 
     public class GameSettingsMonitor
     {
         private int currentLayout = 69;
-
-        private unsafe ConfigModule* cfg = ConfigModule.Instance();
         private unsafe int GetDisplaySetting()
         {
-            try
-            {
-                return cfg->GetIntValue(20);
-            }
-            catch (Exception)
-            {
-                return 0;
-            }
+            return ConfigModule.Instance() == null ? 0 : ConfigModule.Instance()->GetIntValue(20);
         }
-        public void Start(XivCommonBase chatHandler, Configuration configuration)
+        public void Start(Configuration configuration, ClientState clientState)
         {
-            while (true)
+            XivCommonBase chatHandler = new();
+            
+            while (clientState.IsLoggedIn)
             {
-                // got a funky crash when both were set to the same, decided to just do nothing rather
-                // than change config behind the user's back. As nothing should happen anyways.
                 if (configuration.LayoutForWindowedMode != configuration.LayoutForFullscreenMode)
                 {
                     // windowed mode
@@ -110,8 +108,7 @@ namespace AdaptiveHud
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e);
-                            throw;
+                            PluginLog.LogError("Error sending hudlayout command.", e);
                         }
                     }
                     // both fullscreen mode types
@@ -128,12 +125,13 @@ namespace AdaptiveHud
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e);
-                            throw;
+                            PluginLog.LogError("Error sending hudlayout command.", e);
                         }
                     }
                 }
             }
+
+            chatHandler.Functions.Dispose();
         }
     }
 }
