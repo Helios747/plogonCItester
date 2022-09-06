@@ -27,9 +27,6 @@ namespace AdaptiveHud
         private int currentLayout = 69;
 
         private XivCommonBase chatHandler = new();
-        private Configuration configuration = new();
-
-
 
 
         public Plugin(
@@ -84,33 +81,33 @@ namespace AdaptiveHud
         }
         private void Check(object? _)
         {
-            if (configuration.LayoutForWindowedMode != configuration.LayoutForFullscreenMode)
+            if (Configuration.LayoutForWindowedMode != Configuration.LayoutForFullscreenMode)
             {
                 // windowed mode
-                if (GetDisplaySetting() == 0 && currentLayout != configuration.LayoutForWindowedMode)
+                if (GetDisplaySetting() == 0 && currentLayout != Configuration.LayoutForWindowedMode)
                 {
                     try
                     {
-                        int adjustedLayoutValue = configuration.LayoutForWindowedMode + 1;
+                        int adjustedLayoutValue = Configuration.LayoutForWindowedMode + 1;
                         string rawCmd = $"/hudlayout {adjustedLayoutValue}";
                         string cleanCmd = chatHandler.Functions.Chat.SanitiseText(rawCmd);
                         chatHandler.Functions.Chat.SendMessage(cleanCmd);
-                        currentLayout = configuration.LayoutForWindowedMode;
+                        currentLayout = Configuration.LayoutForWindowedMode;
                     }
                     catch (Exception e)
                     {
                         PluginLog.LogError("Error sending hudlayout command.", e);
                     }
                 }
-                else if (GetDisplaySetting() > 0 && currentLayout != configuration.LayoutForFullscreenMode)
+                else if (GetDisplaySetting() > 0 && currentLayout != Configuration.LayoutForFullscreenMode)
                 {
                     try
                     {
-                        int adjustedLayoutValue = configuration.LayoutForFullscreenMode + 1;
+                        int adjustedLayoutValue = Configuration.LayoutForFullscreenMode + 1;
                         string rawCmd = $"/hudlayout {adjustedLayoutValue}";
                         string cleanCmd = chatHandler.Functions.Chat.SanitiseText(rawCmd);
                         chatHandler.Functions.Chat.SendMessage(cleanCmd);
-                        currentLayout = configuration.LayoutForFullscreenMode;
+                        currentLayout = Configuration.LayoutForFullscreenMode;
 
                     }
                     catch (Exception e)
