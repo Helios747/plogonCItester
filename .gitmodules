@@ -1,0 +1,3 @@
+[submodule "lib/XivCommon"]
+	path = lib/XivCommon
+	url = https://git.anna.lgbt/ascclemens/XivCommon.git
