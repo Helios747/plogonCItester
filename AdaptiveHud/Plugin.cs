@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Logging;
